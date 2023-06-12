@@ -32,7 +32,7 @@ public class SRP6 {
 
         String[] registrationData = new String[2];
         registrationData[0] = SALT.toUpperCase();
-        registrationData[1] = VERIFIER.toUpperCase();
+        registrationData[1] = VERIFIER;
 
         return registrationData;
     }
