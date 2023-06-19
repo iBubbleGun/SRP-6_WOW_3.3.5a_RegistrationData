@@ -72,7 +72,7 @@ public class SRP6 {
 
     private static String leftPadWithZeros(String input, int length) {
         while (input.length() < length) {
-            input = "0" + input;
+            input = "0".concat(input);
         }
         return input;
     }
