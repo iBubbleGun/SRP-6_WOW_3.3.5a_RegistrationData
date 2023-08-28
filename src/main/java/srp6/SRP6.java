@@ -20,16 +20,6 @@ public final class SRP6 {
         this.CONSTANT_WOW_N = "894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7";
     }
 
-    public String calculateSRP6Verifier(String ACCOUNT_NAME, String ACCOUNT_PASSWORD, String SALT) {
-        BigInteger g = BigInteger.valueOf(CONSTANT_WOW_G);
-        BigInteger N = new BigInteger(CONSTANT_WOW_N, 16);
-        byte[] h1 = getSHA1Hash((ACCOUNT_NAME + ':' + ACCOUNT_PASSWORD).toUpperCase().getBytes(StandardCharsets.UTF_8));
-        BigInteger h2 = new BigInteger(1, reverseByteArray(getSHA1Hash(concatenateByteArrays(hexStringToByteArray(SALT), h1))));
-        BigInteger pow = g.modPow(h2, N);
-        BigInteger b = new BigInteger(1, reverseByteArray(hexStringToByteArray(leftPadWithZeros(reverseString(pow.toString(16)), 64))));
-        return reverseString(leftPadWithZeros(b.toString(16), 64)).toUpperCase();
-    }
-
     public String[] getRegistrationData(String ACCOUNT_NAME, String ACCOUNT_PASSWORD) {
         final String SALT = getNewSalt(32);
         final String VERIFIER = calculateSRP6Verifier(ACCOUNT_NAME, ACCOUNT_PASSWORD, SALT);
@@ -38,6 +28,16 @@ public final class SRP6 {
 
     public String verifySRP6(String ACCOUNT_NAME, String ACCOUNT_PASSWORD, String SALT) {
         return calculateSRP6Verifier(ACCOUNT_NAME, ACCOUNT_PASSWORD, SALT);
+    }
+
+    private String calculateSRP6Verifier(String ACCOUNT_NAME, String ACCOUNT_PASSWORD, String SALT) {
+        BigInteger g = BigInteger.valueOf(CONSTANT_WOW_G);
+        BigInteger N = new BigInteger(CONSTANT_WOW_N, 16);
+        byte[] h1 = getSHA1Hash((ACCOUNT_NAME + ':' + ACCOUNT_PASSWORD).toUpperCase().getBytes(StandardCharsets.UTF_8));
+        BigInteger h2 = new BigInteger(1, reverseByteArray(getSHA1Hash(concatenateByteArrays(hexStringToByteArray(SALT), h1))));
+        BigInteger pow = g.modPow(h2, N);
+        BigInteger b = new BigInteger(1, reverseByteArray(hexStringToByteArray(leftPadWithZeros(reverseString(pow.toString(16)), 64))));
+        return reverseString(leftPadWithZeros(b.toString(16), 64)).toUpperCase();
     }
 
     private byte[] getSHA1Hash(byte[] input) {
