@@ -8,16 +8,18 @@ public class Examples {
 
     public static void main(String[] args) {
 
+        SRP6 srp6 = new SRP6();
+
         final String USER_LOGIN = "MyLogin";        // Your account Login
         final String USER_PASSWORD = "MyPassword";  // Your account Password
 
-        String[] registartionData = SRP6.getRegistrationData(USER_LOGIN, USER_PASSWORD);
+        String[] registartionData = srp6.getRegistrationData(USER_LOGIN, USER_PASSWORD);
         final String SALT = registartionData[0];
         final String VERIFIER = registartionData[1];
 
         // Check the validity of the authentication data
         boolean isVerified = false;
-        if (VERIFIER.equals(SRP6.verifySRP6(USER_LOGIN, USER_PASSWORD, SALT))) {
+        if (VERIFIER.equals(srp6.verifySRP6(USER_LOGIN, USER_PASSWORD, SALT))) {
             isVerified = true;
         }
 
@@ -26,6 +28,6 @@ public class Examples {
         System.out.println("SALT:           " + SALT);
         System.out.println("VERIFIER:       " + VERIFIER);
         System.out.println("Login verified: " + ((isVerified) ? "Yes" : "No"));
-        System.out.println("--------------------------------------------------------------------------------");
+        System.out.println("-".repeat(80));
     }
 }

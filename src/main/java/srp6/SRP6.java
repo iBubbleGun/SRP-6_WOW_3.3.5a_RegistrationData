@@ -9,39 +9,38 @@ import java.security.NoSuchAlgorithmException;
  *
  * @author Tymur Kosiak (https://github.com/iBubbleGun)
  */
-public class SRP6 {
+public final class SRP6 {
 
-    private static final int CONSTANT_WOW_G = 7;
-    private static final String CONSTANT_WOW_N = "894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7";
+    private final int CONSTANT_WOW_G;
+    private final String CONSTANT_WOW_N;
 
-    public static String calculateSRP6Verifier(String ACCOUNT_NAME, String ACCOUNT_PASSWORD, String SALT) {
+    // Attention! The SRP6 class is immutable.
+    public SRP6() {
+        this.CONSTANT_WOW_G = 7;
+        this.CONSTANT_WOW_N = "894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7";
+    }
+
+    public String calculateSRP6Verifier(String ACCOUNT_NAME, String ACCOUNT_PASSWORD, String SALT) {
         BigInteger g = BigInteger.valueOf(CONSTANT_WOW_G);
         BigInteger N = new BigInteger(CONSTANT_WOW_N, 16);
-
         byte[] h1 = getSHA1Hash((ACCOUNT_NAME + ':' + ACCOUNT_PASSWORD).toUpperCase().getBytes(StandardCharsets.UTF_8));
         BigInteger h2 = new BigInteger(1, reverseByteArray(getSHA1Hash(concatenateByteArrays(hexStringToByteArray(SALT), h1))));
         BigInteger pow = g.modPow(h2, N);
         BigInteger b = new BigInteger(1, reverseByteArray(hexStringToByteArray(leftPadWithZeros(reverseString(pow.toString(16)), 64))));
-
         return reverseString(leftPadWithZeros(b.toString(16), 64)).toUpperCase();
     }
 
-    public static String[] getRegistrationData(String ACCOUNT_NAME, String ACCOUNT_PASSWORD) {
+    public String[] getRegistrationData(String ACCOUNT_NAME, String ACCOUNT_PASSWORD) {
         final String SALT = getNewSalt(32);
         final String VERIFIER = calculateSRP6Verifier(ACCOUNT_NAME, ACCOUNT_PASSWORD, SALT);
-
-        String[] registrationData = new String[2];
-        registrationData[0] = SALT.toUpperCase();
-        registrationData[1] = VERIFIER;
-
-        return registrationData;
+        return new String[]{SALT.toUpperCase(), VERIFIER};
     }
 
-    public static String verifySRP6(String ACCOUNT_NAME, String ACCOUNT_PASSWORD, String SALT) {
+    public String verifySRP6(String ACCOUNT_NAME, String ACCOUNT_PASSWORD, String SALT) {
         return calculateSRP6Verifier(ACCOUNT_NAME, ACCOUNT_PASSWORD, SALT);
     }
 
-    private static byte[] getSHA1Hash(byte[] input) {
+    private byte[] getSHA1Hash(byte[] input) {
         try {
             MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
             return sha1.digest(input);
@@ -51,7 +50,7 @@ public class SRP6 {
         }
     }
 
-    private static byte[] reverseByteArray(byte[] input) {
+    private byte[] reverseByteArray(byte[] input) {
         byte[] reversed = new byte[input.length];
         for (int i = 0; i < input.length; i++) {
             reversed[i] = input[input.length - 1 - i];
@@ -59,7 +58,7 @@ public class SRP6 {
         return reversed;
     }
 
-    private static String reverseString(String str) {
+    private String reverseString(String str) {
         return new StringBuilder(str).reverse().toString();
     }
 
@@ -70,14 +69,14 @@ public class SRP6 {
         return concatenated;
     }
 
-    private static String leftPadWithZeros(String input, int length) {
+    private String leftPadWithZeros(String input, int length) {
         while (input.length() < length) {
             input = "0".concat(input);
         }
         return input;
     }
 
-    private static byte[] hexStringToByteArray(String hexString) {
+    private byte[] hexStringToByteArray(String hexString) {
         int length = hexString.length();
         byte[] byteArray = new byte[length / 2];
         for (int i = 0; i < length; i += 2) {
@@ -87,6 +86,6 @@ public class SRP6 {
     }
 
     private static String getNewSalt(int len) {
-        return HexStringGenerator.getNewHexString(len);
+        return new HexStringGenerator().getNewHexString(len);
     }
 }
