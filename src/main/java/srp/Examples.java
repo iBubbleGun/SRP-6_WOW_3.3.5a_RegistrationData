@@ -1,4 +1,4 @@
-package srp6;
+package srp;
 
 /**
  *

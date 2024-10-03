@@ -1,4 +1,4 @@
-package srp6;
+package srp;
 
 import java.security.SecureRandom;
 
@@ -9,11 +9,11 @@ import java.security.SecureRandom;
 public class HexStringGenerator {
 
     private final SecureRandom random;
-    private final char[] HEX_ARRAY;
+    private final char[] hexArray;
 
     public HexStringGenerator() {
         this.random = new SecureRandom();
-        this.HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+        this.hexArray = "0123456789ABCDEF".toCharArray();
     }
 
     public String getNewHexString(int quantity) {
@@ -24,11 +24,13 @@ public class HexStringGenerator {
 
     private String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
+
         for (int i = 0; i < bytes.length; i++) {
             int v = bytes[i] & 0xFF;
-            hexChars[i * 2] = this.HEX_ARRAY[v >>> 4];
-            hexChars[i * 2 + 1] = this.HEX_ARRAY[v & 0x0F];
+            hexChars[i * 2] = hexArray[v >>> 4];
+            hexChars[i * 2 + 1] = hexArray[v & 0x0F];
         }
+
         return new String(hexChars);
     }
 }
